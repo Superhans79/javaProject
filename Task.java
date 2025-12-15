@@ -7,4 +7,12 @@ public class Task {
         this.description = description;
         this.completed = false;
     }
+
+    public String toString() {
+        if (completed) {
+            return "[x] " + description;
+        } else {
+            return "[ ] " + description;
+        }
+    }
 }
