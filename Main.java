@@ -14,7 +14,8 @@ public class Main {
             System.out.println();
             System.out.println("1. Add task");
             System.out.println("2. View tasks");
-            System.out.println("3. Exit");
+            System.out.println("3. Complete task");
+            System.out.println("4. Exit");
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
@@ -24,10 +25,9 @@ public class Main {
                 System.out.print("Enter task description: ");
                 String description = scanner.nextLine();
 
-                Task task = new Task(description);
-                tasks.add(task);
-
+                tasks.add(new Task(description));
                 System.out.println("Task added!");
+
             } else if (choice == 2) {
 
                 if (tasks.isEmpty()) {
@@ -40,6 +40,23 @@ public class Main {
                 }
 
             } else if (choice == 3) {
+
+                if (tasks.isEmpty()) {
+                    System.out.println("No tasks to complete.");
+                } else {
+                    System.out.print("Enter task number to complete: ");
+                    int taskNumber = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (taskNumber >= 1 && taskNumber <= tasks.size()) {
+                        tasks.get(taskNumber - 1).markComplete();
+                        System.out.println("Task marked as complete!");
+                    } else {
+                        System.out.println("Invalid task number.");
+                    }
+                }
+
+            } else if (choice == 4) {
                 System.out.println("Goodbye!");
                 running = false;
             } else {

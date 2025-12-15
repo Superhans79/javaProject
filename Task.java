@@ -8,6 +8,10 @@ public class Task {
         this.completed = false;
     }
 
+    public void markComplete() {
+        this.completed = true;
+    }
+
     public String toString() {
         if (completed) {
             return "[x] " + description;
