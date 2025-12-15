@@ -1,12 +1,20 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Main {
+
+    static final String FILE_NAME = "tasks.txt";
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         ArrayList<Task> tasks = new ArrayList<>();
         boolean running = true;
+
+        loadTasks(tasks);
 
         System.out.println("Welcome to the Task Manager");
 
@@ -24,7 +32,6 @@ public class Main {
             if (choice == 1) {
                 System.out.print("Enter task description: ");
                 String description = scanner.nextLine();
-
                 tasks.add(new Task(description));
                 System.out.println("Task added!");
 
@@ -57,7 +64,8 @@ public class Main {
                 }
 
             } else if (choice == 4) {
-                System.out.println("Goodbye!");
+                saveTasks(tasks);
+                System.out.println("Tasks saved. Goodbye!");
                 running = false;
             } else {
                 System.out.println("Invalid option");
@@ -65,5 +73,40 @@ public class Main {
         }
 
         scanner.close();
+    }
+
+    static void saveTasks(ArrayList<Task> tasks) {
+        try {
+            FileWriter writer = new FileWriter(FILE_NAME);
+            for (Task task : tasks) {
+                writer.write(task.toFileString() + "\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error saving tasks.");
+        }
+    }
+
+    static void loadTasks(ArrayList<Task> tasks) {
+        try {
+            File file = new File(FILE_NAME);
+            if (!file.exists()) {
+                return;
+            }
+
+            Scanner fileScanner = new Scanner(file);
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                String[] parts = line.split("\\|");
+
+                boolean completed = Boolean.parseBoolean(parts[0]);
+                String description = parts[1];
+
+                tasks.add(new Task(description, completed));
+            }
+            fileScanner.close();
+        } catch (Exception e) {
+            System.out.println("Error loading tasks.");
+        }
     }
 }
