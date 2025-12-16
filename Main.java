@@ -3,10 +3,11 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 
 public class Main {
 
-    static final String FILE_NAME = "tasks.txt";
+    static final String FILE_NAME = "tasks.json";
 
     public static void main(String[] args) {
 
@@ -32,7 +33,12 @@ public class Main {
             if (choice == 1) {
                 System.out.print("Enter task description: ");
                 String description = scanner.nextLine();
-                tasks.add(new Task(description));
+
+                System.out.print("Enter due date (YYYY-MM-DD): ");
+                String dateInput = scanner.nextLine();
+                LocalDate dueDate = LocalDate.parse(dateInput);
+
+                tasks.add(new Task(description, dueDate));
                 System.out.println("Task added!");
 
             } else if (choice == 2) {
@@ -75,38 +81,63 @@ public class Main {
         scanner.close();
     }
 
-    static void saveTasks(ArrayList<Task> tasks) {
-        try {
-            FileWriter writer = new FileWriter(FILE_NAME);
-            for (Task task : tasks) {
-                writer.write(task.toFileString() + "\n");
+static void saveTasks(ArrayList<Task> tasks) {
+    try {
+        FileWriter writer = new FileWriter(FILE_NAME);
+        writer.write("[\n");
+
+        for (int i = 0; i < tasks.size(); i++) {
+            writer.write(tasks.get(i).toJson());
+            if (i < tasks.size() - 1) {
+                writer.write(",\n");
             }
-            writer.close();
-        } catch (IOException e) {
-            System.out.println("Error saving tasks.");
         }
+
+        writer.write("\n]");
+        writer.close();
+    } catch (IOException e) {
+        System.out.println("Error saving tasks.");
+    }
+}
+
+
+static void loadTasks(ArrayList<Task> tasks) {
+    try {
+        File file = new File(FILE_NAME);
+        if (!file.exists()) return;
+
+        Scanner fileScanner = new Scanner(file);
+        StringBuilder json = new StringBuilder();
+
+        while (fileScanner.hasNextLine()) {
+            json.append(fileScanner.nextLine().trim());
+        }
+        fileScanner.close();
+
+        String content = json.toString();
+
+        // Remove [ and ]
+        content = content.substring(1, content.length() - 1);
+
+        if (content.trim().isEmpty()) return;
+
+        String[] items = content.split("\\},\\{");
+
+        for (String item : items) {
+            item = item.replace("{", "").replace("}", "");
+
+            String[] fields = item.split(",");
+
+            String description = fields[0].split(":")[1].replace("\"", "").trim();
+            boolean completed = Boolean.parseBoolean(fields[1].split(":")[1].trim());
+            String dateString = fields[2].split(":")[1].replace("\"", "").trim();
+
+            tasks.add(new Task(description, completed, LocalDate.parse(dateString)));
+        }
+    } catch (Exception e) {
+        System.out.println("Error loading tasks.");
     }
 
-    static void loadTasks(ArrayList<Task> tasks) {
-        try {
-            File file = new File(FILE_NAME);
-            if (!file.exists()) {
-                return;
-            }
 
-            Scanner fileScanner = new Scanner(file);
-            while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine();
-                String[] parts = line.split("\\|");
-
-                boolean completed = Boolean.parseBoolean(parts[0]);
-                String description = parts[1];
-
-                tasks.add(new Task(description, completed));
-            }
-            fileScanner.close();
-        } catch (Exception e) {
-            System.out.println("Error loading tasks.");
-        }
-    }
+}
 }
