@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import com.google.gson.GsonBuilder;
 import java.time.LocalDate;
-
+import java.util.Collections;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -27,9 +27,10 @@ public class TaskService {
         return tasks;
     }
 
-    public void addTask(Task task) {
-        tasks.add(task);
-    }
+public void addTask(Task task) {
+    tasks.add(task);
+    sortByDueDate();
+}
 
     public boolean completeTask(int index) {
         if (index >= 0 && index < tasks.size()) {
@@ -51,9 +52,15 @@ public class TaskService {
         try (FileReader reader = new FileReader(FILE_NAME)) {
             Type taskListType = new TypeToken<ArrayList<Task>>(){}.getType();
             ArrayList<Task> loaded = gson.fromJson(reader, taskListType);
+            Collections.sort(loaded);
             return loaded != null ? loaded : new ArrayList<>();
         } catch (Exception e) {
             return new ArrayList<>();
         }
     }
+
+    public void sortByDueDate() {
+    Collections.sort(tasks);
+}
+
 }

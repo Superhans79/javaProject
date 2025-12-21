@@ -1,6 +1,7 @@
 import java.time.LocalDate;
 
-public class Task {
+public class Task implements Comparable<Task> {
+
 
     String description;
     boolean completed;
@@ -35,4 +36,9 @@ public class Task {
         String status = completed ? "[x]" : "[ ]";
         return status + " " + description + " (Due: " + dueDate + ")";
     }
+
+    @Override
+public int compareTo(Task other) {
+    return this.dueDate.compareTo(other.dueDate);
+}
 }
