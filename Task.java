@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 
+
 public class Task implements Comparable<Task> {
 
 
@@ -32,13 +33,20 @@ public class Task implements Comparable<Task> {
                "  }";
     }
 
-    public String toString() {
-        String status = completed ? "[x]" : "[ ]";
-        return status + " " + description + " (Due: " + dueDate + ")";
-    }
 
-    @Override
+@Override
+public String toString() {
+    String status = completed ? "[✓]" : "[ ]";
+    String overdue = isOverdue() ? " ⚠ OVERDUE" : "";
+    return status + " " + description + " (due " + dueDate + ")" + overdue;
+}
+@Override
 public int compareTo(Task other) {
     return this.dueDate.compareTo(other.dueDate);
 }
+
+public boolean isOverdue() {
+    return !completed && dueDate.isBefore(LocalDate.now());
+}
+
 }
